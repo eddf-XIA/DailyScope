@@ -10,13 +10,13 @@ flowchart TB
   C --> R["Research / discovery<br/>one web-search call to the user's provider"]
   R --> S["Structured response"]
   S --> V{"Valid?"}
-  V -- "yes" --> E["Evidence and event processing<br/>canonical sources, identity, matching"]
-  V -- "cut at the output limit" --> F["Fail with a clear reason<br/>(never 'repaired')"]
-  V -- "complete but malformed" --> D["Deterministic local recovery"]
-  D -- "readable and valid" --> E
-  D -- "still not valid" --> B["One bounded repair request"]
-  B -- "valid" --> E
-  B -- "not valid" --> F
+  V -->|"yes"| E["Evidence and event processing<br/>canonical sources, identity, matching"]
+  V -->|"cut at the output limit"| F["Fail with a clear reason<br/>(never 'repaired')"]
+  V -->|"complete but malformed"| D["Deterministic local recovery"]
+  D -->|"readable and valid"| E
+  D -->|"still not valid"| B["One bounded repair request"]
+  B -->|"valid"| E
+  B -->|"not valid"| F
   E --> P["Stored report<br/>immutable, with its settings snapshot"]
   P --> X["Presentation and export<br/>Compose screens, HTML in four styles"]
 ```

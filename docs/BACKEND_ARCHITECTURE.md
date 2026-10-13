@@ -13,7 +13,7 @@ flowchart TB
   ADM["Admin CLI<br/>append-only audit log"]
   DB[("PostgreSQL 17<br/>Flyway migrations, constraints")]
 
-  A -- "HTTPS" --> API
+  A -->|"HTTPS"| API
   API --> AUTH
   API --> ENT
   AUTH --> DB

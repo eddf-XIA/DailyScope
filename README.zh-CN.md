@@ -75,10 +75,10 @@ flowchart TB
 
   UI --> HOST --> RUN
   RUN --> VAL --> EVT --> REP
-  RUN -. "端口" .-> DB
-  RUN -. "端口" .-> AG
+  RUN -.->|"端口"| DB
+  RUN -.->|"端口"| AG
   AG --> KS
-  AC -. "HTTPS" .-> BE
+  AC -.->|"HTTPS"| BE
 ```
 
 - **研究核心是纯 Kotlin。** 产品逻辑全部位于一组小接口（端口）之后；构建检查会拒绝任何 Android 依赖。同一套领域测试既在普通 JVM 上运行，也在 Android 运行时上运行。

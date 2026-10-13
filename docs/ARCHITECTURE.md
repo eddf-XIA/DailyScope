@@ -26,7 +26,7 @@ flowchart TB
   APP --> DATA
   APP --> CORE
   DATA --> CORE
-  BACK -- "compiles for the shared vocabulary only" --> CORE
+  BACK -->|"compiles for the shared vocabulary only"| CORE
 ```
 
 - **`:core:research` is pure Kotlin.** It holds the provider catalog, prompts, result validation and recovery, event identity and matching, change detection, report assembly and the HTML export. It also holds the runner that orchestrates a run, and the interfaces (ports) it needs: a store, an agent factory, a chat helper, a usage sink and a clock. A build task fails on any Android, AndroidX or WorkManager dependency.

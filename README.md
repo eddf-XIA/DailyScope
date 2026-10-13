@@ -75,10 +75,10 @@ flowchart TB
 
   UI --> HOST --> RUN
   RUN --> VAL --> EVT --> REP
-  RUN -. "ports" .-> DB
-  RUN -. "ports" .-> AG
+  RUN -.->|"ports"| DB
+  RUN -.->|"ports"| AG
   AG --> KS
-  AC -. "HTTPS" .-> BE
+  AC -.->|"HTTPS"| BE
 ```
 
 - **The research core is pure Kotlin.** It holds all of the product's logic behind small interfaces (ports), and a build check fails on any Android dependency. The same domain test suite runs on a plain JVM and on Android's runtime.
