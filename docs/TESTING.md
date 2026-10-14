@@ -15,11 +15,13 @@ From a recorded full run on 2026-10-06: JDK 21, no build cache, no local machine
 | **Unit** (pure JVM) | Research core | 1,023 passed, 1 opt-in skip | Golden and specification fixtures, the runner, prompts, validation, recovery, identity, matching, changes, report HTML |
 | **Integration** (Robolectric) | Android data layer | 388 passed, 2 live-provider tests skipped | Room, DataStore, the credential store, the seven provider adapters over MockWebServer, the chat helper, run coordination, the account client |
 | **UI** (Robolectric) | Android app | 212 passed, 1 opt-in skip | Compose screens on the real stack, run hosting and scheduling, notifications, localization, contrast, performance |
-| **Screenshot** (Roborazzi) | Report scenes | 48 of 48 match their baselines | 12 report scenes × light/dark × default/200 % font |
+| **Screenshot comparison** (Roborazzi) | Report scenes, from 4 of the 212 UI tests | 48 of 48 images match their baselines | 12 report scenes × light/dark × default/200 % font |
 | **Database integration and concurrency** | Backend, on real PostgreSQL 17 | 66 passed | API, activation, sessions, devices, entitlements, admin CLI, migrations, secret logging |
 | **Instrumented** | Real Android Keystore; research-core suite on ART | 2 tests passed; 965 research-core checks passed on ART | Run on an API 34 emulator |
 
-About 1,700 automated JVM tests in total. The same run also built the debug APK, ran Android lint with no errors, and passed ktlint in both builds.
+**1,689 test cases** across the four JVM suites (1,023 + 388 + 212 + 66). The screenshot comparisons and the instrumented checks are not added to that: they come from tests already counted, or re-run them on ART. The same run also built the debug APK, ran Android lint with no errors, and passed ktlint in both builds.
+
+**Since that run**, the only test-code change is five opt-in tests that render this portfolio's screenshots; they are skipped by default and not included above.
 
 **Live tests.** Two data-layer tests call DeepSeek for real. They are skipped unless explicitly enabled, because they are billable.
 
@@ -27,7 +29,7 @@ About 1,700 automated JVM tests in total. The same run also built the debug APK,
 
 ## Fixture-driven parity
 
-The research core is a port of an earlier Python desktop app, and its behavior is pinned by data rather than by prose.
+The research core is a port of DailyScope's Python predecessor, AIOS Intelligence Monitor, and its behavior is pinned by data rather than by prose. Fixture cases are test data, not extra tests: they drive tests counted in the suites above.
 
 | Fixtures | Cases | Origin |
 |---|---|---|
@@ -77,9 +79,9 @@ The same fixtures drive several layers: whole-run cases run through the pure run
 Outside the automated suites:
 
 - **Emulators (API 26, 30, 34 and 37):** the R8 release build installs and runs, the real-Keystore instrumented test passes, and the research-core suite runs on ART.
-- **One physical phone (Android 16):**
+- **One physical phone, a Galaxy S25 Ultra (Android 16):**
   - the background-execution spike that chose the run hosts;
-  - a daily-schedule check on simulated battery with forced Doze: one slot, one run, one agent execution, no duplicate request;
+  - a daily-schedule check on simulated battery with forced Doze: one slot, one run, one agent execution, two vendor requests (the primary request and its one permitted repair), no duplicate request and no automatic retry;
   - walkthroughs of the main flows, including real, user-approved research runs;
   - the English and Simplified Chinese UI and switching between them.
 - **Not yet done:** manufacturer-specific power management (OEM ROMs), a fully unplugged natural-idle scheduled run, and a physical TalkBack walk.

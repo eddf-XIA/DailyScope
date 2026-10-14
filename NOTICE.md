@@ -9,5 +9,5 @@ No license is granted. You are welcome to read these materials and to refer to t
 Third-party material keeps its own owners and licenses:
 
 - The screenshots show an interface built with open-source components (for example Jetpack Compose and Material 3) and rendered with the Roboto typeface. Those components and fonts are licensed by their owners.
-- Product and company names such as Android, Kotlin, Jetpack Compose, Ktor, PostgreSQL and the AI providers named in these documents are the trademarks of their respective owners, and are used here only to describe compatibility.
+- Product and company names such as Android, Kotlin, Jetpack Compose, Ktor, PostgreSQL, Samsung Galaxy and the AI providers named in these documents are the trademarks of their respective owners, and are used here only to describe compatibility and test hardware.
 - The organizations, products, figures and web addresses shown in the screenshots are fictional test data.

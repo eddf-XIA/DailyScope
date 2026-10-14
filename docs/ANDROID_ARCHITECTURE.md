@@ -74,7 +74,7 @@ More in [Security](SECURITY.md).
 
 ### How the design was chosen
 
-Before the run hosting was written, a throwaway spike app hosted the same workload in three candidates: WorkManager expedited work, a user-initiated data-transfer job, and an app-owned `dataSync` foreground service. The workload was one HTTP call to a local server that stays silent for 10 minutes and then answers, with a request ledger as evidence of duplicates. They ran on an Android 16 phone with the screen off, the app swiped away, the notification permission denied and long background periods.
+Before the run hosting was written, a throwaway spike app hosted the same workload in three candidates: WorkManager expedited work, a user-initiated data-transfer job, and an app-owned `dataSync` foreground service. The workload was one HTTP call to a local server that stays silent for 10 minutes and then answers, with a request ledger as evidence of duplicates. They ran on a Galaxy S25 Ultra (Android 16) with the screen off, the app swiped away, the notification permission denied and long background periods.
 
 Findings that became requirements:
 
@@ -96,7 +96,7 @@ One waiting JobScheduler job per scheduled topic, with a minimum latency until t
 - A firing gets a fixed time budget, inside the platform's job window.
 - The battery-optimization exemption is offered, never forced, when the daily update is turned on. Daily runs are best-effort, and the time is shown as "around HH:MM".
 
-### One paid call per run, by construction
+### No duplicate paid calls, by construction
 
 ```kotlin
 // Illustrative sketch, simplified; not the production source.
@@ -104,8 +104,8 @@ suspend fun execute(runId: RunId) {
     // Atomic pending -> running, before any network access.
     if (!store.claim(runId)) return       // already running, finished, or failed by the reconciler
     try {
-        val reply = agent.research(request) // one provider call; the HTTP client never retries
-        // ... validate, recover, at most one repair, record events, assemble the report
+        val reply = agent.research(request) // the primary research request; the HTTP client never retries
+        // ... validate, recover, at most one repair request, record events, assemble the report
     } catch (e: CancellationException) {
         withContext(NonCancellable) { store.fail(runId, interrupted = true) }
         throw e
@@ -115,8 +115,9 @@ suspend fun execute(runId: RunId) {
 
 - **A reconciler** at every process start fails any pending or running run with no live host in this process. A run is reserved the moment it is created, so a reconcile that races a host still starting can't fail it.
 - **Hosts never retry.** Nothing re-runs a started run.
+- **What a run may send.** One primary research request, at most one repair request, and, for ambiguous event matches only, short bounded matching calls ([Research pipeline](RESEARCH_PIPELINE.md#5-evidence-and-event-processing)).
 
-**Device evidence.** On the Android 16 phone, on simulated battery with forced Doze and the exemption granted, one scheduled slot produced exactly one run and one agent execution, with no scheduling duplicates and no automatic retries.
+**Device evidence.** On the Galaxy S25 Ultra, on simulated battery with forced Doze and the exemption granted, one scheduled slot produced exactly one run and one agent execution: two vendor requests (the primary request and its one permitted repair), no scheduling duplicates and no automatic retries.
 
 ### Notifications
 
@@ -140,7 +141,7 @@ A silent channel for run progress, one result notification per topic, and a "did
 - **Domain values stay language-neutral.** Enums keep stable codes and are mapped to resources at the UI boundary. Stored research-layer messages never change; recognised ones are re-rendered in the UI language, and unknown ones are shown as written.
 - **UI language ≠ report language.** Nothing in the UI language reaches a prompt, a stored value or a report.
 - **Tests** fail on a missing translation, a placeholder mismatch, a hard-coded string in Compose code, or Chinese chrome in the English UI. A test also checks that an exported report is byte-identical in both UI languages.
-- **Validated on device:** the English and Chinese UI and switching between them, on an Android 16 phone.
+- **Validated on device:** the English and Chinese UI and switching between them, on a Galaxy S25 Ultra (Android 16).
 
 ---
 

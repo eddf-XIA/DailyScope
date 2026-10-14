@@ -40,7 +40,7 @@ What DailyScope protects, how, and what it does *not* claim. Everything below is
 
 ## Bounded spending
 
-A research call costs the user money. A run makes at most two provider requests; network and HTTP errors are never retried; an interrupted run ends as failed and only the user can start another. A claim-once transition, a unique scheduled-slot identity, a start-up reconciler and an HTTP client with silent retries disabled stop Android's host re-dispatch from repeating a call.
+A research call costs the user money. A run makes one primary research request and at most one repair request, plus short, bounded matching calls only for ambiguous events; network and HTTP errors on research requests are never retried; an interrupted run ends as failed and only the user can start another. A claim-once transition, a unique scheduled-slot identity, a start-up reconciler and an HTTP client with silent retries disabled stop Android's host re-dispatch from repeating a call.
 
 ---
 

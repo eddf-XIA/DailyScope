@@ -40,7 +40,7 @@ The research core also runs on Android's runtime from API 26, so it avoids JDK 9
 
 ### Porting Python semantics explicitly
 
-The research core is a port of an earlier Python desktop app by the same author. Where Python and Kotlin defaults differ (string slicing by code point, JSON formatting, float formatting, URL parsing), the port goes through a small, explicit compatibility layer rather than Kotlin's defaults. The golden fixtures pin the result ([Testing](TESTING.md)).
+The research core is a port of DailyScope's predecessor, AIOS Intelligence Monitor, a Python desktop app by the same author. Where Python and Kotlin defaults differ (string slicing by code point, JSON formatting, float formatting, URL parsing), the port goes through a small, explicit compatibility layer rather than Kotlin's defaults. The golden fixtures pin the result ([Testing](TESTING.md)).
 
 ---
 
@@ -50,7 +50,7 @@ The research core is a port of an earlier Python desktop app by the same author.
 |---|---|
 | **Local-first.** Topics, reports, history and settings live on the device. No cloud sync. | Research output and API keys are personal. The app works with no account and no server. |
 | **Bring your own key.** The user's own provider account is called directly from the device. | No server has to hold provider keys or pay for calls, and the user sees the provider's real cost. |
-| **No automatic retry of paid research calls.** One provider call plus at most one repair; an interrupted run ends as failed. | A retry repeats a whole research pass that costs money and can take minutes. Android can re-dispatch work after process death, so "no retry" is enforced by a claim-once transition in the runner, not by host configuration. |
+| **No automatic retry of paid research calls.** One primary research request plus at most one repair; short matching calls only for ambiguous events; an interrupted run ends as failed. | A retry repeats a whole research pass that costs money and can take minutes. Android can re-dispatch work after process death, so "no retry" is enforced by a claim-once transition in the runner, not by host configuration. |
 | **A host-agnostic runner.** The runner has no Android imports; hosts are adapters. | The scheduled-run host changed during development (from WorkManager to a JobScheduler job) without touching the runner or its tests. |
 | **No Google Play Services dependency.** JobScheduler directly; source links through Custom Tabs, falling back to a plain intent. | The app must run on devices without GMS. |
 | **Native report rendering, no WebView.** Reports are Compose layouts over structured rows; model text is always plain text. | Model output is untrusted input. Rendering it as text removes a class of injection problems. |
@@ -69,7 +69,9 @@ The research core is a port of an earlier Python desktop app by the same author.
 | Manual runs (foreground service), daily runs (JobScheduler), reconciliation | Implemented |
 | Seven bring-your-own-key providers with web search; test connection | Implemented |
 | Validation, deterministic local recovery, one bounded repair, truncation detection | Implemented |
-| Event identity, matching, change detection | Implemented |
+| Event identity, matching, change detection (new/updated events, a Changes view, per-event timelines) | Implemented |
+| A topic-level state model with richer change types (for example confirmed or reversed developments) | Planned |
+| Ingesting chosen sources directly, beyond each provider's web search | Planned |
 | Reports, Changes, past reports, event timeline, HTML export in four styles | Implemented |
 | English and Simplified Chinese UI, per-app language | Implemented |
 | Reports written in a language other than Simplified Chinese | Planned |

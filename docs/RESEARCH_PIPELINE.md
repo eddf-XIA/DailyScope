@@ -27,7 +27,7 @@ The orchestration is one runner in the pure-Kotlin core, behind ports. The same 
 
 ## 1. Claim
 
-The run starts with an atomic `pending → running` transition, before any network access. A run that is not pending returns without a request. This keeps "one paid call per run" true when Android re-dispatches a host after process death ([Android](ANDROID_ARCHITECTURE.md#background-execution-jobscheduler-and-a-foreground-service)). A missing or archived topic fails the run before anything is sent.
+The run starts with an atomic `pending → running` transition, before any network access. A run that is not pending returns without a request. This stops Android from repeating a paid research request when it re-dispatches a host after process death ([Android](ANDROID_ARCHITECTURE.md#background-execution-jobscheduler-and-a-foreground-service)). A missing or archived topic fails the run before anything is sent.
 
 ## 2. Research and discovery
 
@@ -48,12 +48,12 @@ Each provider adapter makes one call with its own web-search tool and records th
 - **Local recovery** runs only when a *complete* reply has no readable JSON. It is a mechanical repair of common formatting mistakes: it keeps every character of the model's text and never guesses missing content. A recovered object that is still invalid is not accepted.
 - **One repair request** is made only after a parse or validation failure. If the repair reply is itself cut at the limit, the run fails with a separate message.
 
-So a run makes **at most two provider requests**, and network and HTTP errors are never retried. Usage records note when recovery was used; the reply itself is never stored there.
+So a run makes **at most two research requests** (the primary request and one repair), and network and HTTP errors on them are never retried. Usage records note when recovery was used; the reply itself is never stored there.
 
 ## 5. Evidence and event processing
 
 - **Evidence.** Each source is stored once, under a canonical URL and its hash.
-- **Event identity.** Each event is matched against the topic's recent events. Deterministic rules settle the clear cases without a model call. Ambiguous cases may go to a small, separate model judgement; if that helper is unavailable or fails, a deterministic rule decides. **When unsure, the event is new**: a false "update" is worse than a duplicate.
+- **Event identity.** Each event is matched against the topic's recent events. Deterministic rules settle the clear cases without a model call. Ambiguous cases may go to a small, separate model judgement (on by default; at most two attempts per ambiguous event, through the lighter chat helper below); if that helper is unavailable or fails, a deterministic rule decides. **When unsure, the event is new**: a false "update" is worse than a duplicate.
 - **Neutral facts only.** Matching reads only the neutral fields and the primary citations. The preference-shaped writing and background citations never reach identity, matching, confidence or change detection, so changing the output preferences can't split or merge events.
 - **Create or update.** A new event gets a stable key; a matched event accumulates what is known about it. Each run adds an observation with its facts, its writing and its source links.
 - A failure on one event is recorded as a run error, and the rest continue.
@@ -74,4 +74,4 @@ Reports are rendered natively in Compose and exported as self-contained HTML in 
 
 ## The lighter chat helper
 
-Drafting a brief from a sentence, revising it from an instruction, and the matching judgement use a lighter chat call on the same provider, with JSON output. It is bounded too: a small number of attempts with backoff, and rate-limit, balance and authentication errors are never retried. `Test connection` makes one attempt and never throws.
+Drafting a brief from a sentence, revising it from an instruction, and the matching judgement use a lighter chat call on the same provider, with JSON output. These are short, separate requests, billed like any other; during a run, only the matching judgement uses it. It is bounded too: a small number of attempts with backoff, and rate-limit, balance and authentication errors are never retried. `Test connection` makes one attempt and never throws.
